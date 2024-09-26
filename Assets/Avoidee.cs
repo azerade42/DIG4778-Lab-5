@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class Avoidee : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Avoider target;
+    private NavMeshAgent agent;
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        agent = GetComponent<NavMeshAgent>();
+    }
+    private void Update()
+    {
+        agent.SetDestination(target.transform.position);
     }
 }

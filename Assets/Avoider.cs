@@ -6,96 +6,167 @@ using System.Linq;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Avoider : MonoBehaviour
 {
-    //Require the object I need to avoid (avoidee)
     [SerializeField] private Avoidee objToAvoid;
-//Require the range that I do not allow the avoidee to approach
     [SerializeField] private float visionRange;
-//Require if I need to visualize
     [SerializeField] private float agentSpeed;
     [SerializeField] private bool showGizmos;
+    [SerializeField] private float sampleTickRate = 2f;
+    
+    private NavMeshAgent agent;
+    private AvoiderState avoiderState;
+    private List<Vector2> samplesSeen = new List<Vector2>();
+    private List<Vector2> samplesHidden = new List<Vector2>();
+    private int sampleCount;
+    private int sampleCountMax = 1;
+    private float timeSinceLastSample;
+    private float timeSinceLastSeen;
 
-    private List<Vector2> movesToDraw = new List<Vector2>();
-    private int moveCount;
-    private int moveCountMax = 50;
-
-    private float timeElapsed;
-
-/* GENERAL LOOP */
-//Do this forever
-    private void Update()
+    private void Start()
     {
-         //Can the avoidee see me?
-   //No: Wait a bit and check again
-   //Yes: Is there a place to run? (is the candidate list empty?)  
-       //No: Wait a bit and check again
-       //Yes: Tell the agent to move there (which point in the candidate list is closest?)
+        agent = GetComponent<NavMeshAgent>();
+        agent.speed = agentSpeed;
+    }
+
+    private void FixedUpdate()
+    {
+        // Check if there is an obstruction between the avoider and the avoidee
         if (Physics.Raycast(objToAvoid.transform.position, transform.position - objToAvoid.transform.position, out RaycastHit hitInfo))
         {
+            // If there is a direct line of sight, start making the avoider run away
             if (hitInfo.collider.gameObject.GetComponent<Avoider>())
             {
-                SampleValidMoves();
+                timeSinceLastSeen = 0;
+                avoiderState = AvoiderState.Running;
             }
             else
             {
-                print("Avoidee cannot see avoider!");
+                // Stop the avoider if it has been more than a second since there has been a direct line of sight with the avoidee
+                timeSinceLastSeen += Time.fixedDeltaTime;
+                if (timeSinceLastSeen > 1f)
+                {
+                    avoiderState = AvoiderState.Stopped;
+                }
+            }
+
+            if (avoiderState == AvoiderState.Running)
+            {
+                SampleValidMoves();
+            }
+            if (avoiderState == AvoiderState.Stopped)
+            {
+                print("Stopped since Avoider has not seen the avoidee for over a second");
+                agent.velocity = Vector3.zero;
             }
         }
 
-        if (timeElapsed > 1f)
+        // Move to a sample point and recalculate sample moves
+        if (timeSinceLastSample > sampleTickRate)
         {
-            timeElapsed = 0f;
-            movesToDraw = new List<Vector2>();
+            MoveToClosestPoint();
+            timeSinceLastSample = 0f;
+            sampleCount = 0;
+            samplesSeen = new List<Vector2>();
+            samplesHidden = new List<Vector2>();
         }
 
-        timeElapsed += Time.deltaTime;
+        timeSinceLastSample += Time.fixedDeltaTime;
     }
 
-    /* FIND A SPOT */
-//Create a PoissonDiscSampler
-//Create a collection to store candidate hiding spots
-//Foreach point visualize a line to it
-//Foreach point in the PoissonDiscSampler, can the avoidee see it? (check visibility to point)
-   //Yes: ignore that point
-   //No: add the point to the candidate list
+   // Uses the PoissonDiscSampler to create and store valid and invalid hiding spots for the avoider to move to
     private void SampleValidMoves()
     {
-        if (movesToDraw.Count() >= moveCountMax) return;
+        if (++sampleCount > sampleCountMax) return;
 
         PoissonDiscSampler sampler = new PoissonDiscSampler(visionRange*2, visionRange*2, 1f);
         foreach (Vector2 sample in sampler.Samples())
         {
-            Vector2 offsetSample = new Vector2(sample.x - visionRange, sample.y - visionRange);
-            movesToDraw.Add(offsetSample);
+            Vector2 offsetSample = new Vector2(transform.position.x + sample.x - visionRange, transform.position.z + sample.y - visionRange);
+            Vector3 raycastDirection = new Vector3(offsetSample.x, 1, offsetSample.y) - objToAvoid.transform.position;
+            
+            if (Physics.Raycast(objToAvoid.transform.position, raycastDirection,  out RaycastHit hitInfo, raycastDirection.magnitude))
+            {
+                // Sample position is behind the Avoider and therefore seen by the avoidee
+                if (hitInfo.collider.gameObject.GetComponent<Avoider>())
+                {
+                    samplesSeen.Add(offsetSample);
+                }
+                // Sample position is behind anything that isn't the avoider and is therefore hidden from the Avoidee
+                else
+                {
+                    samplesHidden.Add(offsetSample);
+                }
+            }
+            // Sample position does not have an obstruction from avoidee
+            else
+            {
+                samplesSeen.Add(offsetSample);
+            }
         }
-
-        // foreach (Vector2 point in sampler.Samples())
-        // {
-        //     print(point);
-        // }
     }
 
+    // Uses the hidden points generated by the sampler to determine the closest point for the avoider to move to
+    private void MoveToClosestPoint()
+    {
+        float closestPointDistance = float.MaxValue;
+        NavMeshPath path = null;
+        NavMeshPath shortestPath = null;
 
-/* CHECK VISIBILITY TO POINT */
-//Create a ray from one point to another
-//Check if the ray hits something that is not the player (avoidee)
-   //NO: The point is visible
-   //YES: The point is not visible
-   
+        for (int i = 0; i < samplesHidden.Count(); i++)
+        {
+            Vector2 currentPoint = samplesHidden.ElementAt(i);
+            if (currentPoint == null) continue;
+
+            path = new NavMeshPath();
+
+            if (NavMesh.CalculatePath(transform.position, new Vector3(currentPoint.x, 1, currentPoint.y), agent.areaMask, path))
+            {
+                float dist = Vector3.Distance(transform.position, path.corners[0]);
+
+                for (int j = 1; j < path.corners.Length; j++)
+                {
+                    dist += Vector3.Distance(path.corners[j - 1], path.corners[0]);
+                }
+
+                if (dist < closestPointDistance)
+                {
+                    closestPointDistance = dist;
+                    shortestPath = path;
+                }
+            }
+        }
+
+        if (shortestPath != null)
+        {
+            agent.SetPath(shortestPath);
+        }
+    }
+
+    // Visualizes the sample points that the avoider tries to move to every tick
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        if (!showGizmos) return;
 
-        if (showGizmos)
+        Gizmos.color = Color.white;
+        Gizmos.DrawRay(objToAvoid.transform.position, transform.position - objToAvoid.transform.position);
+
+        DrawSamples(samplesSeen, Color.red);
+        DrawSamples(samplesHidden, Color.green);
+    }
+
+    private void DrawSamples(List<Vector2> samplePoints, Color lineColor)
+    {
+        List<Vector3> pointsToDraw = new List<Vector3>();
+        foreach (Vector2 point in samplePoints)
         {
-            Gizmos.DrawRay(objToAvoid.transform.position, transform.position - objToAvoid.transform.position);
+            pointsToDraw.Add(transform.position);
+            pointsToDraw.Add(new Vector3(point.x, 1, point.y));
 
-            List<Vector3> validMoves = new List<Vector3>();
-            foreach (Vector2 point in movesToDraw)
-            {
-                validMoves.Add(transform.position);
-                validMoves.Add(new Vector3(point.x, 0, point.y));
-            }
-            Gizmos.DrawLineList(validMoves.ToArray());
+            // debugging raycast from Avoidee
+            // Gizmos.color = Color.blue;
+            // Vector3 raycastDirection = new Vector3(point.x, 1, point.y) - objToAvoid.transform.position;
+            // Gizmos.DrawRay(objToAvoid.transform.position, raycastDirection);
         }
+        Gizmos.color = lineColor;
+        Gizmos.DrawLineList(pointsToDraw.ToArray());
     }
 }
