@@ -1386,17 +1386,6 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!114 &935857703 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8053167962058252330, guid: dbecf56860b262d4abd1362d5bd47792, type: 3}
-  m_PrefabInstance: {fileID: 9131483513966186211}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c2e5609cdb576949a6c5e82150831da, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1186960135
 GameObject:
   m_ObjectHideFlags: 0
@@ -3871,7 +3860,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3585002209725899202, guid: ff36d66dba6091446bd0cf627fa22501, type: 3}
       insertIndex: 1
-      addedObject: {fileID: 1183425004443685306}
+      addedObject: {fileID: 1183425004443685312}
     - targetCorrespondingSourceObject: {fileID: 3585002209725899202, guid: ff36d66dba6091446bd0cf627fa22501, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1183425004443685311}
@@ -3881,19 +3870,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3585002209725899202, guid: ff36d66dba6091446bd0cf627fa22501, type: 3}
   m_PrefabInstance: {fileID: 1183425004443685304}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1183425004443685306
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1183425004443685305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cd143862d6763c4cbc38f0f67c41de4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 935857703}
 --- !u!195 &1183425004443685311
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -3916,6 +3892,19 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1183425004443685312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1183425004443685305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1993529270, guid: 7c7f6546053e5274e9ced179cd10411a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 9131483513966186213}
 --- !u!1001 &9131483513966186211
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3979,7 +3968,7 @@ PrefabInstance:
     - target: {fileID: 8053167962058252330, guid: dbecf56860b262d4abd1362d5bd47792, type: 3}
       propertyPath: objToAvoid
       value: 
-      objectReference: {fileID: 1183425004443685306}
+      objectReference: {fileID: 0}
     - target: {fileID: 8053167962058252330, guid: dbecf56860b262d4abd1362d5bd47792, type: 3}
       propertyPath: showGizmos
       value: 1
@@ -4008,11 +3997,37 @@ PrefabInstance:
       propertyPath: m_StoppingDistance
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8053167962058252330, guid: dbecf56860b262d4abd1362d5bd47792, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5067703309856630533, guid: dbecf56860b262d4abd1362d5bd47792, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 9131483513966186213}
   m_SourcePrefab: {fileID: 100100000, guid: dbecf56860b262d4abd1362d5bd47792, type: 3}
+--- !u!1 &9131483513966186212 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5067703309856630533, guid: dbecf56860b262d4abd1362d5bd47792, type: 3}
+  m_PrefabInstance: {fileID: 9131483513966186211}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9131483513966186213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9131483513966186212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -925425294, guid: 7c7f6546053e5274e9ced179cd10411a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objToAvoid: {fileID: 1183425004443685312}
+  visionRange: 8
+  agentSpeed: 5
+  showGizmos: 1
+  sampleTickRate: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -4020,6 +4035,6 @@ SceneRoots:
   - {fileID: 480343518}
   - {fileID: 1583962575}
   - {fileID: 9131483513966186211}
-  - {fileID: 172828647}
   - {fileID: 1183425004443685304}
+  - {fileID: 172828647}
   - {fileID: 562570860}
