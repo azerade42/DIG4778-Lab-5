@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5316223434395117441}
-  - component: {fileID: 8053167962058252330}
+  - component: {fileID: 4885604448094813598}
   - component: {fileID: 9121877916555906462}
   - component: {fileID: 6863150232485920187}
   - component: {fileID: 6519470136370794016}
@@ -36,7 +36,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8053167962058252330
+--- !u!114 &4885604448094813598
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,13 +45,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 5067703309856630533}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c2e5609cdb576949a6c5e82150831da, type: 3}
+  m_Script: {fileID: -925425294, guid: 7c7f6546053e5274e9ced179cd10411a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objToAvoid: {fileID: 0}
-  visionRange: 1.42
-  agentSpeed: 0
-  showGizmos: 0
+  visionRange: 8
+  agentSpeed: 5
+  showGizmos: 1
+  sampleTickRate: 2
 --- !u!195 &9121877916555906462
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -63,15 +64,15 @@ NavMeshAgent:
   m_AgentTypeID: -1372625422
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 1
-  m_BaseOffset: 0
+  m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!33 &6863150232485920187
@@ -140,7 +141,7 @@ CapsuleCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
