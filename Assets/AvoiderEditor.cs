@@ -8,14 +8,12 @@ public class AvoiderEditor : Editor
     private SerializedProperty visionRangeProperty;
     private SerializedProperty agentSpeedProperty;
     private SerializedProperty showGizmosProperty;
-    private SerializedProperty sampleTickRateProperty;
 
     private void OnEnable()
     {
         avoideeProperty = serializedObject.FindProperty("objToAvoid");
         visionRangeProperty = serializedObject.FindProperty("visionRange");
         agentSpeedProperty = serializedObject.FindProperty("agentSpeed");
-        sampleTickRateProperty = serializedObject.FindProperty("sampleTickRate");
         showGizmosProperty = serializedObject.FindProperty("showGizmos");
     }
     public override void OnInspectorGUI()
@@ -33,10 +31,6 @@ public class AvoiderEditor : Editor
         EditorGUILayout.PropertyField(agentSpeedProperty);
         if (agentSpeedProperty.floatValue < 0)
             EditorGUILayout.HelpBox("Agent speed cannot be negative.", MessageType.Warning);
-
-        EditorGUILayout.PropertyField(sampleTickRateProperty);
-        if (sampleTickRateProperty.floatValue < 0)
-            EditorGUILayout.HelpBox("Tick rate cannot be negative.", MessageType.Warning);
 
         EditorGUILayout.PropertyField(showGizmosProperty);
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,6 +10,7 @@ public class Avoidee : MonoBehaviour
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        agent.stoppingDistance = 1f;
     }
     private void Update()
     {
